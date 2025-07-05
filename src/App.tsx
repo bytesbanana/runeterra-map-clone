@@ -15,7 +15,6 @@ const App = () => {
   useEffect(() => {
     const wheelEvent = (e: WheelEvent) => {
       e.stopPropagation();
-      // console.log("Wheel event detected", e.deltaY);
 
       if (cameraRef.current) {
         const distant = e.deltaY * 0.001;
