@@ -1,15 +1,38 @@
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three"; //
 import styles from "./App.module.css";
 import { PerspectiveCamera, Stats } from "@react-three/drei";
-import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM, TILES } from "./config";
+import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
 import { useIsMounted } from "./useIsMounted";
+import { MapLayer } from "./MapLayer";
+
+const MAP_MIN_X = -5;
+const MAP_MAX_X = 5;
+const MAP_MIN_Y = -5;
+const MAP_MAX_Y = 5;
 
 const App = () => {
   const isMounted = useIsMounted();
-  const [terrianMap, depthMap] = useLoader(THREE.TextureLoader, TILES);
+
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
+
+  function clampCamera(camera: THREE.PerspectiveCamera) {
+    // Calculate half view size at current Z
+    const vFOV = (camera.fov * Math.PI) / 180;
+    const height = 2 * Math.tan(vFOV / 2) * camera.position.z;
+    const width = height * camera.aspect;
+
+    // Clamp so frustum stays inside map
+    camera.position.x = Math.max(
+      MAP_MIN_X + width / 2,
+      Math.min(MAP_MAX_X - width / 2, camera.position.x)
+    );
+    camera.position.y = Math.max(
+      MAP_MIN_Y + height / 2,
+      Math.min(MAP_MAX_Y - height / 2, camera.position.y)
+    );
+  }
 
   useEffect(() => {
     if (!isMounted()) return;
@@ -27,10 +50,11 @@ const App = () => {
       if (cameraRef.current.position.z > MAX_ZOOM) {
         cameraRef.current.position.z = MAX_ZOOM;
       }
+      clampCamera(cameraRef.current); // <-- Add this
       cameraRef.current.updateProjectionMatrix();
     };
     window.addEventListener("wheel", wheelEvent);
-    // Implement panning event
+
     let isPanning = false;
     let lastX = 0;
     let lastY = 0;
@@ -47,6 +71,7 @@ const App = () => {
       const deltaY = (e.clientY - lastY) * 0.001;
       cameraRef.current.position.x -= deltaX;
       cameraRef.current.position.y += deltaY;
+      clampCamera(cameraRef.current);
       lastX = e.clientX;
       lastY = e.clientY;
     };
@@ -70,19 +95,9 @@ const App = () => {
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault
-          position={[0, -0.25, DEFAULT_ZOOM]}
-          fov={50}
+          position={[0, 0, DEFAULT_ZOOM]}
         />
-        <ambientLight intensity={3} />
-        <pointLight position={[10, 10, 10]} />
-        <mesh>
-          <planeGeometry args={[10, 10, 256, 256]} />
-          <meshStandardMaterial
-            map={terrianMap}
-            displacementMap={depthMap}
-            displacementScale={1}
-          />
-        </mesh>
+        <MapLayer />
         <Stats />
       </Canvas>
     </div>
