@@ -81,7 +81,7 @@ export const MapLayer = () => {
       <Cloud cloudMap={cloudMap} />
       <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
         <planeGeometry args={[10, 10, 2048, 2048]} />
-        <ambientLight intensity={3} />
+        <ambientLight intensity={4} />
         <meshStandardMaterial
           map={terrianMap}
           displacementMap={depthMap}
