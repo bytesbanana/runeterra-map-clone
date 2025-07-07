@@ -7,10 +7,10 @@ import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
 import { useIsMounted } from "./useIsMounted";
 import { MapLayer } from "./MapLayer";
 
-const MAP_MIN_X = -5;
-const MAP_MAX_X = 5;
-const MAP_MIN_Y = -5;
-const MAP_MAX_Y = 5;
+const MAP_MIN_X = -4;
+const MAP_MAX_X = 4;
+const MAP_MIN_Y = -4;
+const MAP_MAX_Y = 4;
 
 const App = () => {
   const isMounted = useIsMounted();
@@ -92,6 +92,7 @@ const App = () => {
   return (
     <div className={styles.container}>
       <Canvas>
+        {/* <OrbitControls /> */}
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault

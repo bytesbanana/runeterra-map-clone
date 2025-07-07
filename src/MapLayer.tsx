@@ -1,11 +1,12 @@
 import { useFrame, useLoader } from "@react-three/fiber";
-import { TILES } from "./config";
+import { PINS, TILES } from "./config";
 import * as THREE from "three";
 import { useRef } from "react";
+import { pxToWorld } from "./helpers";
 
 const CLOUD_SPEED = 0.005;
 const CLOUD_OPACITY = 0.3;
-const CLOUD_SIZE = 12;
+const CLOUD_SIZE = 8;
 
 const Cloud = ({ cloudMap }: { cloudMap: THREE.Texture }) => {
   const cloud1 = useRef<THREE.Mesh>(null);
@@ -80,7 +81,7 @@ export const MapLayer = () => {
     <>
       <Cloud cloudMap={cloudMap} />
       <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[10, 10, 2048, 2048]} />
+        <planeGeometry args={[8, 8, 2048, 2048]} />
         <ambientLight intensity={4} />
         <meshStandardMaterial
           map={terrianMap}
@@ -88,6 +89,17 @@ export const MapLayer = () => {
           displacementScale={1}
         />
       </mesh>
+
+      {PINS.map((pin) => (
+        <group key={pin.name}>
+          <mesh position={pxToWorld(pin.position)}>
+            <axesHelper />
+            <sphereGeometry args={[0.02, 32, 32]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <meshStandardMaterial color={pin.color} />
+          </mesh>
+        </group>
+      ))}
     </>
   );
 };
