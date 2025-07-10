@@ -7,6 +7,7 @@ import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
 import { useIsMounted } from "./useIsMounted";
 import { MapLayer } from "./layers/Map";
 import { Cloud } from "./layers/Cloud";
+import { gsap } from "gsap";
 
 const MAP_MIN_X = -4;
 const MAP_MAX_X = 4;
@@ -39,22 +40,23 @@ const App = () => {
     if (!isMounted()) return;
     const abortController = new AbortController();
     const { signal } = abortController;
-    const wheelEvent = (e: WheelEvent) => {
-      e.stopPropagation();
-
+    function handleWheelEvent(e: WheelEvent) {
       if (!cameraRef.current) return;
-      const distant = e.deltaY * 0.001;
-      cameraRef.current.translateZ(distant);
-      if (cameraRef.current.position.z < MIN_ZOOM) {
-        cameraRef.current.position.z = MIN_ZOOM;
-      }
-      if (cameraRef.current.position.z > MAX_ZOOM) {
-        cameraRef.current.position.z = MAX_ZOOM;
-      }
-      clampCamera(cameraRef.current);
-      cameraRef.current.updateProjectionMatrix();
-    };
-    window.addEventListener("wheel", wheelEvent);
+      const distant = e.deltaY * 0.05;
+      let newZ = cameraRef.current.position.z + distant;
+      newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZ));
+
+      gsap.to(cameraRef.current.position, {
+        z: newZ,
+        duration: 0.3,
+        ease: "power4",
+        onUpdate: () => {
+          clampCamera(cameraRef.current!);
+          cameraRef.current!.updateProjectionMatrix();
+        },
+      });
+    }
+    window.addEventListener("wheel", handleWheelEvent);
 
     let isPanning = false;
     let lastX = 0;
