@@ -6,6 +6,7 @@ import { PerspectiveCamera, Stats } from "@react-three/drei";
 import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
 import { useIsMounted } from "./useIsMounted";
 import { MapLayer } from "./MapLayer";
+import { Cloud } from "./Cloud";
 
 const MAP_MIN_X = -4;
 const MAP_MAX_X = 4;
@@ -50,7 +51,7 @@ const App = () => {
       if (cameraRef.current.position.z > MAX_ZOOM) {
         cameraRef.current.position.z = MAX_ZOOM;
       }
-      clampCamera(cameraRef.current); // <-- Add this
+      clampCamera(cameraRef.current);
       cameraRef.current.updateProjectionMatrix();
     };
     window.addEventListener("wheel", wheelEvent);
@@ -92,12 +93,12 @@ const App = () => {
   return (
     <div className={styles.container}>
       <Canvas>
-        {/* <OrbitControls /> */}
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault
           position={[0, 0, DEFAULT_ZOOM]}
         />
+        <Cloud />
         <MapLayer />
         <Stats />
       </Canvas>
