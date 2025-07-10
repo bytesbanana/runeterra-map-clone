@@ -3,11 +3,20 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three"; //
 import styles from "./App.module.css";
 import { PerspectiveCamera, Stats } from "@react-three/drei";
-import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
+import {
+  DEFAULT_ZOOM,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  PINS,
+  REGION_IMAGES,
+} from "./config";
 import { useIsMounted } from "./useIsMounted";
 import { MapLayer } from "./layers/Map";
 import { Cloud } from "./layers/Cloud";
 import { gsap } from "gsap";
+import { useLoader } from "@react-three/fiber";
+
+import { pxToWorld } from "./helpers";
 
 const MAP_MIN_X = -4;
 const MAP_MAX_X = 4;
@@ -18,6 +27,8 @@ const App = () => {
   const isMounted = useIsMounted();
 
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
+
+  const regionImages = useLoader(THREE.TextureLoader, REGION_IMAGES);
 
   function clampCamera(camera: THREE.PerspectiveCamera) {
     // Calculate half view size at current Z
@@ -101,6 +112,30 @@ const App = () => {
           position={[0, 0, DEFAULT_ZOOM]}
         />
         <Cloud />
+
+        {PINS.map((pin) => {
+          const [x, y, z] = pxToWorld(pin.position);
+          return (
+            <group key={pin.name}>
+              <mesh position={[x, y, z + 0.2]} renderOrder={0}>
+                {pin.type === "circle" && (
+                  <>
+                    <circleGeometry args={[pin.size, 32]} />
+                  </>
+                )}
+                {pin.type === "rectangle" && (
+                  <boxGeometry args={[pin.size, pin.size * 2, 0]} />
+                )}
+                <meshBasicMaterial
+                  transparent
+                  opacity={1}
+                  map={regionImages[pin.regionImageIndex]}
+                />
+              </mesh>
+            </group>
+          );
+        })}
+
         <MapLayer />
         <Stats />
       </Canvas>
