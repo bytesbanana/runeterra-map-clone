@@ -1,5 +1,5 @@
 import { useFrame, useLoader } from "@react-three/fiber";
-import { CLOULDS } from "./config";
+import { CLOULDS } from "../config";
 import * as THREE from "three";
 import { useRef } from "react";
 

@@ -5,8 +5,8 @@ import styles from "./App.module.css";
 import { PerspectiveCamera, Stats } from "@react-three/drei";
 import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM } from "./config";
 import { useIsMounted } from "./useIsMounted";
-import { MapLayer } from "./MapLayer";
-import { Cloud } from "./Cloud";
+import { MapLayer } from "./layers/Map";
+import { Cloud } from "./layers/Cloud";
 
 const MAP_MIN_X = -4;
 const MAP_MAX_X = 4;
